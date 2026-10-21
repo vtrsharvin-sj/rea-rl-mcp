@@ -4,8 +4,9 @@ import { StdioServerTransport } from "@modelcontextprotocol/server/stdio";
 import { createProduct } from "./server.js";
 import { ReaUpstream, reaScript } from "./upstream.js";
 import { generateFrontend, writeFrontend } from "./frontend.js";
+import { nativeReadiness } from "./readiness.js";
 
-const HELP = `REA RL MCP 0.1.0
+const HELP = `REA RL MCP 0.1.1
 
 rea-rl mcp [--rea-script ABSOLUTE_SCRIPT] [--cache-mb 64] [--policy POLICY_JSON]
 rea-rl doctor [--rea-script ABSOLUTE_SCRIPT]
@@ -42,7 +43,7 @@ async function main() {
     return;
   }
   if (command === "--version") {
-    console.log("0.1.0");
+    console.log("0.1.1");
     return;
   }
   if (command === "config") {
@@ -87,12 +88,14 @@ async function main() {
       console.log(
         JSON.stringify({
           ok: true,
+          ok_scope: "MCP connection and status query",
           node: process.version,
           rea_script: config.script,
           upstream_tools: tools.length,
           transport: "stdio",
           default_modality: "text",
           learning: "session-local Q-learning",
+          ...(await nativeReadiness(upstream)),
         }),
       );
     } finally {

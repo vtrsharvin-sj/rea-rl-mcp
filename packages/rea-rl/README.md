@@ -4,6 +4,8 @@ A local MCP server for reverse engineering with **real REA tools**, compact text
 
 Works with Claude Code, Codex, and other MCP clients over stdio. This is an independent extension of [morluto/rea](https://github.com/morluto/rea), not an official upstream release.
 
+Native C/C++ analysis uses the same Ghidra, IDA, Hopper or Kuna providers and native tools as REA. JavaScript, managed/mobile artifact analysis and other upstream workflows remain available through discovery. HTML/CSS/JS generation is an optional web reconstruction tool. See the [native workflow](docs/WORKFLOW.md#native-cc-binaries-and-original-rea-providers).
+
 ## Install from this repository
 
 Use Node.js 24.11 or newer in the 24.x line (22.19+ also supported). From the repository root:
@@ -23,7 +25,7 @@ The package is not published to npm yet. Do not use `npx rea-rl-mcp` until you p
 
 ```sh
 npm pack
-npm install -g /absolute/path/rea-rl-mcp-0.1.0.tgz
+npm install -g /absolute/path/rea-rl-mcp-0.1.1.tgz
 rea-rl doctor
 ```
 

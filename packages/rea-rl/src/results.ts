@@ -18,7 +18,7 @@ export function pointer(value: unknown, path: string) {
   }
   return value;
 }
-function unwrap(raw: CallToolResult): unknown {
+export function unwrap(raw: CallToolResult): unknown {
   if (raw.structuredContent !== undefined) return raw.structuredContent;
   const texts = raw.content.filter((c) => c.type === "text").map((c) => c.text);
   if (texts.length === 1) {

@@ -39,7 +39,7 @@ export class ReaUpstream implements ReaConnection {
     return this.pending;
   }
   private async open() {
-    const client = new Client({ name: "rea-rl-mcp", version: "0.1.0" });
+    const client = new Client({ name: "rea-rl-mcp", version: "0.1.1" });
     const env = Object.fromEntries(
       Object.entries(process.env).filter(
         (entry): entry is [string, string] => entry[1] !== undefined,
