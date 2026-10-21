@@ -106,6 +106,12 @@ explicit path or endpoint and do not need it.
   consult the NativeAOT workflow in `references/native-and-artifacts.md` for
   optional metadata recovery and its supported host/layout boundary.
 - User-owned browser page already open: `list_browser_targets`.
+- Website frontend the user wants to recreate: inspect the selected route with
+  `inspect_web_page` and `capture_web_screenshot`, then capture only requested
+  interactions with `capture_browser_scenario`. Build in the user's project,
+  compare at the same viewport with `compare_web_screenshots`, and report
+  unobserved states as unknown. Follow the
+  [website reconstruction workflow](https://github.com/morluto/rea/blob/main/docs/browser-observation.md#reconstruct-a-website-interface).
 - Browser action the agent must perform (click, type, navigate):
   `capture_browser_scenario` with declared actions. See
   [runtime observation](references/runtime-observation.md) for connect/launch

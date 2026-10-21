@@ -1,0 +1,63 @@
+{
+  "name": "rea-rl-mcp",
+  "version": "0.1.0",
+  "description": "Text-first reverse engineering MCP with REA, local reinforcement learning, OKF knowledge and visual fallback.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "rea-rl": "dist/cli.mjs"
+  },
+  "engines": {
+    "node": "^22.19.0 || ^24.11.0 || >=26.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "NOTICE",
+    "docs",
+    "examples",
+    "AGENTS.md",
+    "CLAUDE.md"
+  ],
+  "keywords": [
+    "mcp",
+    "reverse-engineering",
+    "reinforcement-learning",
+    "okf",
+    "claude-code",
+    "codex",
+    "rea"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --import tsx --test test/*.test.ts",
+    "check": "npm run typecheck && npm test && npm run build",
+    "start": "node dist/cli.mjs mcp",
+    "prepack": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/client": "2.3.1",
+    "@modelcontextprotocol/server": "2.3.1",
+    "pngjs": "7.0.0",
+    "rea-agents": "6.7.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.4",
+    "@types/pngjs": "6.0.5",
+    "esbuild": "0.28.2",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vtrsharvin-sj/rea-rl-mcp.git",
+    "directory": "packages/rea-rl"
+  },
+  "homepage": "https://github.com/vtrsharvin-sj/rea-rl-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/vtrsharvin-sj/rea-rl-mcp/issues"
+  }
+}

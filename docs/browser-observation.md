@@ -39,6 +39,46 @@ available in the capture.
 
 Target discovery returns the complete in-scope target array in one result.
 
+## Reconstruct a website interface
+
+Use browser Evidence to guide a separate implementation in the user's project.
+Start from a specific route, viewport, and visible state; a single screenshot is
+not a specification for the full application.
+
+1. Inspect the already-open, user-selected page with `list_browser_targets`,
+   then `inspect_web_page`. Capture its visible viewport with
+   `capture_web_screenshot`. These operations observe the page without driving
+   it or evaluating its code.
+2. Follow the user's requested interactions only. When an interaction must be
+   observed, record the exact route and declared actions with
+   `capture_browser_scenario`; do not broaden the action sequence or infer
+   unobserved states.
+3. Use `analyze_web_bundle` on selected captured scripts when application
+   structure or route behavior matters. Treat route and endpoint candidates as
+   derived evidence, not proof that a route exists or that a request should be
+   made. Keep observations, inferences, and unknowns distinct while translating
+   the findings into the new implementation.
+4. Run the implementation in the user's project and capture it at the same
+   viewport and state. Compare the two PNG artifacts with
+   `compare_web_screenshots`, then refine visible differences. This comparison
+   is pixel-based and does not explain what a difference means or establish
+   functional equivalence; verify requested interactions against their own
+   observed outcomes.
+
+Keep a short checklist of the routes, viewport sizes, and interaction states
+the user asked to reproduce. Mark unobserved states as unknown, and report the
+remaining visual and functional gaps instead of claiming a complete replica.
+The inspection tools do not copy target code or assets into the new project.
+Use only material the user has rights to reuse; recreate behavior and layout
+from the evidence when direct reuse is not authorized.
+
+The source-checkout [OKF/RL frontend generator](../experiments/okf-rl/README.md#automatic-frontend-generation)
+can turn a text-approved `inspect_web_page` Evidence object into a runnable local
+HTML/CSS/JavaScript project. It preserves observed content and control states,
+uses an explicit responsive layout choice, and records unresolved original
+behavior. Generation is an exploratory adapter operation, separate from the
+packaged browser inspection tools.
+
 ## Screenshot comparison memory budget
 
 `compare_web_screenshots` admits both PNGs against a 256 MiB estimated

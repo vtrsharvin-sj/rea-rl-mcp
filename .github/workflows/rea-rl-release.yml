@@ -1,0 +1,73 @@
+name: REA RL package
+on:
+  workflow_dispatch:
+  push:
+    branches: ["**"]
+    tags: ["rea-rl-v*"]
+    paths:
+      [
+        "packages/rea-rl/**",
+        "src/domain/**",
+        "package-lock.json",
+        ".github/workflows/rea-rl-release.yml",
+      ]
+  pull_request:
+    paths:
+      [
+        "packages/rea-rl/**",
+        "src/domain/**",
+        "package-lock.json",
+        ".github/workflows/rea-rl-release.yml",
+      ]
+permissions:
+  contents: read
+jobs:
+  check:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            packages/rea-rl/package-lock.json
+      - run: npm ci
+      - run: npm ci
+        working-directory: packages/rea-rl
+      - run: npm run check
+        working-directory: packages/rea-rl
+      - run: node -e "require('fs').mkdirSync('artifacts', {recursive:true})"
+      - run: npm pack --pack-destination ../../artifacts
+        working-directory: packages/rea-rl
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: rea-rl-${{ matrix.os }}
+          path: artifacts/*.tgz
+  release:
+    if: startsWith(github.ref, 'refs/tags/rea-rl-v')
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: rea-rl-ubuntu-latest
+          path: artifacts
+      - name: Verify version and release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          package_file=$(find artifacts -name '*.tgz' -print -quit)
+          version=$(tar -xOf "$package_file" package/package.json | jq -r .version)
+          test "$RELEASE_TAG" = "rea-rl-v$version"
+          sha256sum "$package_file" > artifacts/SHA256SUMS
+          gh release create "$RELEASE_TAG" "$package_file" artifacts/SHA256SUMS --title "REA RL $version" --generate-notes
