@@ -4,7 +4,11 @@ A local MCP server for reverse engineering with **real REA tools**, compact text
 
 Works with Claude Code, Codex, and other MCP clients over stdio. This is an independent extension of [morluto/rea](https://github.com/morluto/rea), not an official upstream release.
 
-Native C/C++ analysis uses the same Ghidra, IDA, Hopper or Kuna providers and native tools as REA. JavaScript, managed/mobile artifact analysis and other upstream workflows remain available through discovery. HTML/CSS/JS generation is an optional web reconstruction tool. See the [native workflow](docs/WORKFLOW.md#native-cc-binaries-and-original-rea-providers).
+Native C/C++ analysis uses the same Ghidra, IDA, Hopper or Kuna providers and native tools as REA. All 207 original tools and six original prompts are exposed directly by default, with their original schemas. JavaScript, managed/mobile artifact analysis and other upstream workflows remain available. HTML/CSS/JS generation is an optional web reconstruction tool. See the [native workflow](docs/WORKFLOW.md#native-cc-binaries-and-original-rea-providers).
+
+`rea-rl official <arguments...>` runs the pinned original REA CLI with inherited input, output, environment and exit status. For example, `rea-rl official --help` shows its complete command interface. Provider setup and platform/license requirements remain those of REA.
+
+Direct tools and `rea_run` share one REA process and target session. Direct calls return original results; execute through `rea_run` when you want retained results, summaries, RL decision feedback or OKF export. For clients that need a smaller tool catalog, launch `rea-rl mcp --compact` to expose only the eight additive tools and discover original schemas on demand.
 
 ## Install from this repository
 
@@ -25,7 +29,7 @@ The package is not published to npm yet. Do not use `npx rea-rl-mcp` until you p
 
 ```sh
 npm pack
-npm install -g /absolute/path/rea-rl-mcp-0.1.1.tgz
+npm install -g /absolute/path/rea-rl-mcp-0.2.0.tgz
 rea-rl doctor
 ```
 
@@ -75,7 +79,7 @@ Also exposes the `reverse_engineer` prompt and `rea-rl://workflow` resource.
 
 ## What the product does
 
-- **Text first:** eight visible tools; demand-driven upstream schemas, compact previews and paged original results. Visual fallback requires an explicit reason. Requesting `rea_run` with `detail:"full"` deliberately returns the original content, which can include images. No measured token reduction is claimed.
+- **Text first:** compact previews and paged original results through the additive tools; optional `--compact` mode reduces the visible catalog to eight tools. The default catalog contains all original tools plus the additions. Visual fallback requires an explicit reason. Direct original calls and `rea_run` with `detail:"full"` preserve original content, which can include images. No measured token reduction is claimed.
 - **RL:** tabular Q-learning over domain/target/stage and available action names. Reward = fixed goal predicate + optional human rating − failure penalty − 0.01 step cost; alpha 0.25, gamma 0.9. Exploration is opt-in (10%). This learns action preferences, not model weights. Quality improvements have not been established by a benchmark.
 - **OKF:** Google Open Knowledge Format 0.2 Markdown concepts plus complete source JSON. Confidence tags are this product's extension, not Google's verification system. OKF stores knowledge; it does not perform training.
 - **Frontend:** three layouts and two themes, responsive CSS, semantic accessible controls, local form validation and provenance. It generates an inferred scaffold from approved captured text. It does not recover original CSS, images, backend behavior, or guarantee a pixel match. Agents can use REA screenshot comparison to iterate.

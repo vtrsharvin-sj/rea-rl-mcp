@@ -1,6 +1,6 @@
 {
   "name": "rea-rl-mcp",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Text-first reverse engineering MCP with REA, local reinforcement learning, OKF knowledge and visual fallback.",
   "type": "module",
   "license": "MIT",

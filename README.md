@@ -25,7 +25,7 @@ Ask your agent to investigate a selected target using text first, retrieve only 
 
 ## Included
 
-- **Eight MCP tools** wrapping the real published REA catalog through schema discovery and exact forwarding.
+- **All 207 official REA tools and six original prompts**, plus eight additive MCP tools. Original schemas, provider implementations and session workflows are preserved. `rea-rl official ...` runs the original CLI; `rea-rl mcp --compact` offers the smaller discovery interface.
 - **Compact text with retained originals**, explicit paging, and PNG crop/resize fallback.
 - **Local tabular Q-learning** with fixed result predicates and optional human feedback. No LLM training or benchmarked quality gain is claimed.
 - **Google OKF 0.2 export** with original source results, Evidence provenance and optional learned policy.

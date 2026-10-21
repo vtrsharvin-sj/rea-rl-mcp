@@ -2,19 +2,23 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { StdioServerTransport } from "@modelcontextprotocol/server/stdio";
 import { createProduct } from "./server.js";
+import { createFullProduct } from "./full.js";
+import { spawn } from "node:child_process";
 import { ReaUpstream, reaScript } from "./upstream.js";
 import { generateFrontend, writeFrontend } from "./frontend.js";
 import { nativeReadiness } from "./readiness.js";
 
-const HELP = `REA RL MCP 0.1.1
+const HELP = `REA RL MCP 0.2.0
 
-rea-rl mcp [--rea-script ABSOLUTE_SCRIPT] [--cache-mb 64] [--policy POLICY_JSON]
+rea-rl mcp [--compact] [--rea-script ABSOLUTE_SCRIPT] [--cache-mb 64] [--policy POLICY_JSON]
+rea-rl official [original REA arguments...]
 rea-rl doctor [--rea-script ABSOLUTE_SCRIPT]
 rea-rl generate PAGE_EVIDENCE NEW_OUTPUT_DIR [document|sidebar|cards] [light|dark]
 rea-rl config
 
 Runs locally over MCP stdio. REA supplies the reverse-engineering tools.
-Results default to compact text. Images are requested only for concrete visual gaps.
+All official REA tools are exposed by default, alongside the RL additions.
+Use --compact for the eight-tool discovery interface. Prefer text; request images for visual gaps.
 `;
 function options(args: string[]) {
   const result: { script: string; budget: number; policy: string | undefined } =
@@ -43,7 +47,23 @@ async function main() {
     return;
   }
   if (command === "--version") {
-    console.log("0.1.1");
+    console.log("0.2.0");
+    return;
+  }
+  if (command === "official") {
+    const child = spawn(process.execPath, [reaScript(), ...args], {
+      stdio: "inherit",
+      windowsHide: true,
+    });
+    for (const signal of ["SIGINT", "SIGTERM"] as const)
+      process.once(signal, () => child.kill(signal));
+    await new Promise<void>((resolve, reject) => {
+      child.once("error", reject);
+      child.once("exit", (code, signal) => {
+        process.exitCode = code ?? (signal ? 1 : 0);
+        resolve();
+      });
+    });
     return;
   }
   if (command === "config") {
@@ -80,7 +100,10 @@ async function main() {
   }
   if (command !== "mcp" && command !== "doctor")
     throw new Error("Unknown command: " + command);
-  const config = options(args),
+  const compact = command === "mcp" && args.includes("--compact");
+  const config = options(
+      compact ? args.filter((arg) => arg !== "--compact") : args,
+    ),
     upstream = new ReaUpstream(config.script);
   if (command === "doctor") {
     try {
@@ -103,12 +126,23 @@ async function main() {
     }
     return;
   }
-  const product = createProduct(upstream, config.budget * 1024 * 1024);
-  if (config.policy)
-    product.policy.load(JSON.parse(await readFile(config.policy, "utf8")));
+  const product = compact
+    ? createProduct(upstream, config.budget * 1024 * 1024)
+    : await createFullProduct(upstream, config.budget * 1024 * 1024);
+  if (config.policy) {
+    try {
+      product.policy.load(JSON.parse(await readFile(config.policy, "utf8")));
+    } catch (error) {
+      await product.close();
+      await product.server.close();
+      throw error;
+    }
+  }
   let closing: Promise<void> | undefined;
   const close = () => (closing ??= product.close());
-  product.server.server.onclose = () => {
+  const protocol =
+    "server" in product.server ? product.server.server : product.server;
+  protocol.onclose = () => {
     void close().catch((error) => {
       console.error(error);
       process.exitCode = 1;

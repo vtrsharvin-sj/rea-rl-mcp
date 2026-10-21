@@ -2,6 +2,14 @@
 
 Locally exercised on Windows with Node 24.19.0, using pinned published REA 6.7.0. This records checked behavior, not a performance or provider conformance certification.
 
+## Full interface (0.2.0)
+
+The default stdio catalog contains 215 tools: all 207 official tool definitions are compared for exact equality with a separate published REA process, plus eight additions. Original prompt definitions are compared as well; the workflow resource and resource-template behavior are checked. Unknown original tool calls preserve protocol failure. The real integration exercises the RL, PNG, OKF and frontend additions. Compact mode retains eight tools, and original CLI help is delegated through `rea-rl official --help`.
+
+The Ghidra native check opens and analyzes through direct original tools, retrieves procedures through `rea_run`, then closes directly. It passed with 228 procedures, nonempty C-like pseudocode and assembly, demonstrating shared target state across both interfaces. This does not imply every original tool/provider was executed. IDA, Hopper and Kuna retain upstream platform and setup requirements.
+
+The earlier validation below records the initial product and provider checks.
+
 - Product TypeScript check and bundle: passed.
 - Six product tests: passed. The stdio integration uses a real MCP client and the published REA subprocess, discovers schemas, inspects the actual Node executable, retrieves its observed format, credits a fixed predicate, requests a PNG, exports OKF/policy, and generates a frontend from a labeled synthetic page fixture. Existing output directories are rejected.
 - Eleven source lab/frontend tests: passed, including real local Edge observation, desktop/mobile preview and control interaction, and REA PNG comparison. The browser target is a local fixture, not an independently replicated customer application.

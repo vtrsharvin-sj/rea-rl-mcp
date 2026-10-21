@@ -1,5 +1,7 @@
 # End-to-end workflow
 
+The default MCP interface exposes the original REA tools directly, plus the additions below. Use original tools normally for their full results. The retained-result workflow below is useful for RL decisions, concise text retrieval and OKF exports; both paths share the same open target. `--compact` hides the original catalog and uses discovery instead. Native analysis does not require frontend generation.
+
 1. Identify the user's selected target and authorized interaction scope.
 2. Call `rea_discover` with relevant words and `detail:"names"`; request `detail:"schema"` for exact selected names. Do not guess upstream arguments.
 3. Optionally call `rl_suggest` with the current context and available names. Example context: `{"domain":"analysis","target":"native","stage":"inventory"}`. A goal can be `{"pointer":"/format","operator":"equals","expected":"pe"}` for a selected Windows executable; the predicate is evaluated against normalized Evidence when available.

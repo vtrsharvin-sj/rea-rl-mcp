@@ -32,7 +32,9 @@ test(
     let opened = false;
     const run = async (name: string, input: Record<string, unknown>) => {
       const result = await client.callTool(
-        { name: "rea_run", arguments: { name, input, detail: "full" } },
+        name === "list_procedures"
+          ? { name: "rea_run", arguments: { name, input, detail: "full" } }
+          : { name, arguments: input },
         { timeout: 240000 },
       );
       assert.ok(!result.isError, JSON.stringify(result));

@@ -30,7 +30,7 @@ export class ReaUpstream implements ReaConnection {
   private pending: Promise<Client> | undefined;
   private closing = false;
   constructor(readonly script = reaScript()) {}
-  private connect() {
+  connect() {
     if (this.closing) throw new Error("REA connection is closing");
     this.pending ??= this.open().catch((error) => {
       this.pending = undefined;
@@ -39,7 +39,7 @@ export class ReaUpstream implements ReaConnection {
     return this.pending;
   }
   private async open() {
-    const client = new Client({ name: "rea-rl-mcp", version: "0.1.1" });
+    const client = new Client({ name: "rea-rl-mcp", version: "0.2.0" });
     const env = Object.fromEntries(
       Object.entries(process.env).filter(
         (entry): entry is [string, string] => entry[1] !== undefined,

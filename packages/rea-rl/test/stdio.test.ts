@@ -10,6 +10,37 @@ import type { CallToolResult } from "@modelcontextprotocol/server";
 import { createEvidence } from "../../../src/domain/evidence.js";
 import { jsonValueSchema } from "../../../src/domain/jsonValue.js";
 import { passiveNetworkCapture } from "../../../tests/fixtures/passiveNetworkCapture.js";
+import { ReaUpstream } from "../src/upstream.js";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+
+test("compact mode remains available and original CLI help is forwarded", async () => {
+  const cli = process.env.REA_RL_TEST_BIN;
+  const prefix = cli ? [cli] : ["--import", "tsx", resolve("src/cli.ts")];
+  const client = new Client({ name: "compact-check", version: "1" });
+  try {
+    await client.connect(
+      new StdioClientTransport({
+        command: process.execPath,
+        args: [...prefix, "mcp", "--compact"],
+        stderr: "inherit",
+      }),
+    );
+    assert.equal((await client.listTools()).tools.length, 8);
+    assert.ok(
+      (await client.readResource({ uri: "rea-rl://workflow" })).contents.length,
+    );
+  } finally {
+    await client.close();
+  }
+  const output = await promisify(execFile)(
+    process.execPath,
+    [...prefix, "official", "--help"],
+    { maxBuffer: 4 * 1024 * 1024 },
+  );
+  assert.match(output.stdout, /REA|rea/);
+  assert.match(output.stdout, /mcp/);
+});
 
 const json = (result: CallToolResult) => {
   assert.ok(!result.isError, JSON.stringify(result));
@@ -32,7 +63,48 @@ test("real stdio server discovers and calls published REA, learns feedback, retr
   try {
     await client.connect(transport);
     const visible = (await client.listTools()).tools;
-    assert.equal(visible.length, 8);
+    const original = new ReaUpstream();
+    try {
+      const official = await original.connect();
+      const tools = (await official.listTools()).tools;
+      assert.equal(visible.length, tools.length + 8);
+      for (const tool of tools)
+        assert.deepEqual(
+          visible.find((t) => t.name === tool.name),
+          tool,
+        );
+      const prompts = (await client.listPrompts()).prompts;
+      for (const prompt of (await official.listPrompts()).prompts)
+        assert.deepEqual(
+          prompts.find((p) => p.name === prompt.name),
+          prompt,
+        );
+      const resources = (await client.listResources()).resources;
+      assert.ok(resources.some((r) => r.uri === "rea-rl://workflow"));
+      if (official.getServerCapabilities()?.resources) {
+        for (const resource of (await official.listResources()).resources)
+          assert.deepEqual(
+            resources.find((r) => r.uri === resource.uri),
+            resource,
+          );
+        assert.deepEqual(
+          await client.listResourceTemplates(),
+          await official.listResourceTemplates(),
+        );
+      } else
+        assert.deepEqual(await client.listResourceTemplates(), {
+          resourceTemplates: [],
+        });
+      const direct = json(
+        await client.callTool({ name: "binary_session", arguments: {} }),
+      );
+      assert.ok(direct.result);
+      await assert.rejects(
+        client.callTool({ name: "not_a_real_rea_tool", arguments: {} }),
+      );
+    } finally {
+      await original.close();
+    }
     const found = json(
       await client.callTool({
         name: "rea_discover",
