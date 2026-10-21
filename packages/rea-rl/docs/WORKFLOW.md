@@ -27,7 +27,7 @@ This generator is deterministic and does not call a model. A connected coding ag
 
 REA RL forwards the original native tools without translating them into HTML or JavaScript. The MCP transport implementation is TypeScript; the actual binary analysis is performed by the original selected REA provider.
 
-1. Discover the schema for `binary_session`, then call it through `rea_run` with `input:{}`. Retrieve `/analysis_provider_candidates` with `rea_result` for full provider status. An available tool name alone does not mean its engine is installed.
+1. Discover the schema for `binary_session`, then call it through `rea_run` with `input:{}`. Retrieve `/result/analysis_provider_candidates` with `rea_result` for full provider status. An available tool name alone does not mean its engine is installed.
 2. Discover `open_binary` and pass the user's absolute target path and chosen `provider_id`, such as `ghidra`. Respect its supported platforms and target formats.
 3. Discover `list_procedures`, `search_procedures` and `analyze_function` as needed. Select an exact returned function name/address. `procedure_pseudo_code` returns the original provider's decompilation; `analyze_function` adds assembly, references, calls and limitations.
 4. Use RL context `{domain:"analysis",target:"native",stage:"structure"}` and real upstream tool candidates to guide the investigation. Retain or export full Evidence. Decompiled C-like text is reconstructed pseudocode, not guaranteed compilable C or original source.
