@@ -182,6 +182,7 @@ export class LearningPolicy {
     row[d.action] = entry;
     this.decisions.delete(id);
     return {
+      result_id: d.resultId,
       reward,
       signals: rewardSignals,
       goal_passed: goalPassed,

@@ -150,6 +150,16 @@ test("real stdio server discovers and calls published REA, learns feedback, retr
       }),
     );
     assert.equal(directFeedback.goal_passed, true);
+    const directValue = json(
+      await client.callTool({
+        name: "rea_result",
+        arguments: {
+          result_id: directFeedback.result_id,
+          pointer: "/normalized_result/format",
+        },
+      }),
+    );
+    assert.equal(JSON.parse(directValue.text), format);
     const wrapperSuggestion = json(
       await client.callTool({
         name: "rl_suggest",
