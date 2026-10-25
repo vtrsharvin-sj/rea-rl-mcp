@@ -139,6 +139,10 @@ export class LearningPolicy {
       throw new Error("Invalid or already executed decision");
     d.executing = true;
   }
+  discardExecuting(id: string) {
+    const decision = this.decisions.get(id);
+    if (decision?.executing && !decision.resultId) this.decisions.delete(id);
+  }
   feedback(
     id: string,
     next: Context,

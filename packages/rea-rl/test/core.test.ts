@@ -1,9 +1,12 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { PNG } from "pngjs";
+import { Client } from "@modelcontextprotocol/client";
+import { InMemoryTransport } from "@modelcontextprotocol/server";
 import { ResultStore, pointer, summarize } from "../src/results.js";
 import { LearningPolicy, goalSchema } from "../src/policy.js";
 import { visualResult } from "../src/visual.js";
+import { createProduct } from "../src/server.js";
 const context = {
   domain: "analysis",
   target: "native",
@@ -126,6 +129,53 @@ test("failed tools cannot earn a goal reward", () => {
   const feedback = policy.feedback(d.decision_id, context, true, undefined);
   assert.equal(feedback.goal_passed, false);
   assert.equal(feedback.reward, -1.01);
+});
+test("a thrown upstream call remains available for negative RL feedback", async () => {
+  const product = createProduct({
+    tools: async () => [{ name: "throwing", inputSchema: { type: "object" } }],
+    call: async () => {
+      throw new Error("provider unavailable");
+    },
+    close: async () => {},
+  });
+  const client = new Client({ name: "error-test", version: "1" });
+  const [clientTransport, serverTransport] =
+    InMemoryTransport.createLinkedPair();
+  try {
+    await product.server.connect(serverTransport);
+    await client.connect(clientTransport);
+    const suggested = await client.callTool({
+      name: "rl_suggest",
+      arguments: { context, candidates: ["throwing"] },
+    });
+    const decision = JSON.parse(
+      suggested.content.find((c) => c.type === "text")!.text,
+    ).decision_id as string;
+    const failed = await client.callTool({
+      name: "rea_run",
+      arguments: { name: "throwing", input: {}, decision_id: decision },
+    });
+    assert.equal(failed.isError, true);
+    const summary = JSON.parse(
+      failed.content.find((c) => c.type === "text")!.text,
+    );
+    assert.equal(summary.is_error, true);
+    assert.ok(summary.result_id);
+    const credited = await client.callTool({
+      name: "rl_feedback",
+      arguments: { decision_id: decision, next_context: context, done: true },
+    });
+    const feedback = JSON.parse(
+      credited.content.find((c) => c.type === "text")!.text,
+    );
+    assert.equal(feedback.result_id, summary.result_id);
+    assert.equal(feedback.signals.failure, -1);
+    assert.equal(feedback.goal_passed, false);
+  } finally {
+    await client.close();
+    await product.server.close();
+    await product.close();
+  }
 });
 test("visual fallback crops and resizes PNGs with bounded decode admission", () => {
   const png = new PNG({ width: 256, height: 128 });

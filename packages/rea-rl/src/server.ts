@@ -22,18 +22,19 @@ const reason = z.enum([
   "text_insufficient",
   "visual_verification",
 ]);
+const errorResult = (error: unknown): CallToolResult => ({
+  ...textResult({
+    error: error instanceof Error ? error.message : String(error),
+  }),
+  isError: true,
+});
 const safe = async (
   run: () => Promise<CallToolResult>,
 ): Promise<CallToolResult> => {
   try {
     return await run();
   } catch (error) {
-    return {
-      ...textResult({
-        error: error instanceof Error ? error.message : String(error),
-      }),
-      isError: true,
-    };
+    return errorResult(error);
   }
 };
 async function jsonFile(path: string) {
@@ -123,13 +124,29 @@ export function createProduct(
       safe(async () => {
         if (input.decision_id)
           policy.assertAction(input.decision_id, input.name);
-        const raw = await upstream.call(
-          input.name,
-          input.input,
-          context.mcpReq.signal,
-        );
-        const item = store.add(input.name, raw);
-        if (input.decision_id) policy.bind(input.decision_id, input.name, item);
+        let raw: CallToolResult;
+        try {
+          raw = await upstream.call(
+            input.name,
+            input.input,
+            context.mcpReq.signal,
+          );
+        } catch (error) {
+          if (context.mcpReq.signal.aborted) {
+            if (input.decision_id) policy.discardExecuting(input.decision_id);
+            throw error;
+          }
+          raw = errorResult(error);
+        }
+        let item;
+        try {
+          item = store.add(input.name, raw);
+          if (input.decision_id)
+            policy.bind(input.decision_id, input.name, item);
+        } catch (error) {
+          if (input.decision_id) policy.discardExecuting(input.decision_id);
+          throw error;
+        }
         if (input.detail === "full")
           return { ...raw, _meta: { ...raw._meta, rea_rl_result_id: item.id } };
         const summary = textResult(summarize(item));
