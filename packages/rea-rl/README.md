@@ -29,7 +29,7 @@ The package is not published to npm yet. Do not use `npx rea-rl-mcp` until you p
 
 ```sh
 npm pack
-npm install -g /absolute/path/rea-rl-mcp-0.2.1.tgz
+npm install -g /absolute/path/rea-rl-mcp-0.2.2.tgz
 rea-rl doctor
 ```
 
