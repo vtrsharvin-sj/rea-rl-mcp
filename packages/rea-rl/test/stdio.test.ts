@@ -134,12 +134,38 @@ test("real stdio server discovers and calls published REA, learns feedback, retr
         },
       }),
     );
+    const direct = await client.callTool({
+      name: "inspect_go_binary",
+      arguments: { path: process.execPath },
+    });
+    assert.ok(!direct.isError);
+    const directFeedback = json(
+      await client.callTool({
+        name: "rl_feedback",
+        arguments: {
+          decision_id: suggested.decision_id,
+          next_context: context,
+          done: true,
+        },
+      }),
+    );
+    assert.equal(directFeedback.goal_passed, true);
+    const wrapperSuggestion = json(
+      await client.callTool({
+        name: "rl_suggest",
+        arguments: {
+          context,
+          candidates: ["inspect_go_binary"],
+          goal: { pointer: "/format", operator: "equals", expected: format },
+        },
+      }),
+    );
     const run = await client.callTool({
       name: "rea_run",
       arguments: {
         name: "inspect_go_binary",
         input: { path: process.execPath },
-        decision_id: suggested.decision_id,
+        decision_id: wrapperSuggestion.decision_id,
       },
     });
     const summary = json(run);
@@ -159,7 +185,7 @@ test("real stdio server discovers and calls published REA, learns feedback, retr
       await client.callTool({
         name: "rl_feedback",
         arguments: {
-          decision_id: suggested.decision_id,
+          decision_id: wrapperSuggestion.decision_id,
           next_context: context,
           done: true,
         },

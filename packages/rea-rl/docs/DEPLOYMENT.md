@@ -4,13 +4,13 @@
 
 Run `npm ci` at the repository root, then `npm ci` and `npm run check` in `packages/rea-rl`. Use Node 24. The root dependencies are needed to bundle shared domain contracts. Runtime installations only need the built tarball and its declared dependencies.
 
-Run `npm pack` in this package. Install the resulting tarball globally on the agent's machine using `npm install -g /absolute/path/rea-rl-mcp-0.2.0.tgz`. Run `rea-rl doctor`, then configure the client as shown in the README. The server is deployed locally through the client's stdio process launcher.
+Run `npm pack` in this package. Install the resulting tarball globally on the agent's machine using `npm install -g /absolute/path/rea-rl-mcp-0.2.1.tgz`. Run `rea-rl doctor`, then configure the client as shown in the README. The server is deployed locally through the client's stdio process launcher.
 
 ## GitHub release
 
 This product repository is `vtrsharvin-sj/rea-rl-mcp`. The root is marked private to avoid accidentally publishing the upstream package identity. The original REA workflows are preserved under `.github/upstream-workflows` as inactive reference; the active workflow verifies and distributes this product.
 
-The `rea-rl-release.yml` workflow checks and packages on changes and supports manual runs. Push a tag `rea-rl-v0.2.0` matching the package version to create a GitHub Release containing the tarball and SHA-256 checksum. The workflow uses the built-in repository token; no model keys or npm credentials are required. Review package contents before tagging. Releases do not publish to npm.
+The `rea-rl-release.yml` workflow checks and packages on changes and supports manual runs. Push a tag `rea-rl-v0.2.1` matching the package version to create a GitHub Release containing the tarball and SHA-256 checksum. The workflow uses the built-in repository token; no model keys or npm credentials are required. Review package contents before tagging. Releases do not publish to npm.
 
 For npm publication, first choose a package name you own, update the package and lockfile together, and configure trusted publishing or npm authentication for that identity. This repository intentionally does not enable automatic npm publication.
 

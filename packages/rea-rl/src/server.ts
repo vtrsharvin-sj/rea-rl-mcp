@@ -47,7 +47,7 @@ export function createProduct(
   budgetBytes = 64 * 1024 * 1024,
 ) {
   const server = new McpServer(
-    { name: "rea-rl-mcp", version: "0.2.0" },
+    { name: "rea-rl-mcp", version: "0.2.1" },
     { instructions: INSTRUCTIONS },
   );
   const store = new ResultStore(budgetBytes),

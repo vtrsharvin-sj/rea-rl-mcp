@@ -8,7 +8,7 @@ Native C/C++ analysis uses the same Ghidra, IDA, Hopper or Kuna providers and na
 
 `rea-rl official <arguments...>` runs the pinned original REA CLI with inherited input, output, environment and exit status. For example, `rea-rl official --help` shows its complete command interface. Provider setup and platform/license requirements remain those of REA.
 
-Direct tools and `rea_run` share one REA process and target session. Direct calls return original results; execute through `rea_run` when you want retained results, summaries, RL decision feedback or OKF export. For clients that need a smaller tool catalog, launch `rea-rl mcp --compact` to expose only the eight additive tools and discover original schemas on demand.
+Direct tools and `rea_run` share one REA process and target session. Direct calls return original results. After `rl_suggest`, a direct call to the recommended tool is linked for feedback when there is exactly one matching pending decision. Use `rea_run` with `decision_id` for explicit binding when several matching recommendations are pending, and use it when you want retained summaries and paged result access. For clients that need a smaller tool catalog, launch `rea-rl mcp --compact` to expose only the eight additive tools and discover original schemas on demand.
 
 ## Install from this repository
 
@@ -29,7 +29,7 @@ The package is not published to npm yet. Do not use `npx rea-rl-mcp` until you p
 
 ```sh
 npm pack
-npm install -g /absolute/path/rea-rl-mcp-0.2.0.tgz
+npm install -g /absolute/path/rea-rl-mcp-0.2.1.tgz
 rea-rl doctor
 ```
 

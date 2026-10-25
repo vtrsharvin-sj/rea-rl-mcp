@@ -118,6 +118,21 @@ export class LearningPolicy {
     if (decision.resultId) throw new Error("Decision already has a result");
     decision.resultId = result.id;
   }
+  pendingDirectDecision(action: string) {
+    const matches = [...this.decisions.entries()].filter(
+      ([, decision]) =>
+        decision.action === action &&
+        decision.resultId === undefined &&
+        !decision.executing,
+    );
+    return matches.length === 1 ? matches[0]![0] : undefined;
+  }
+  bindDirect(action: string, result: StoredResult) {
+    const decisionId = this.pendingDirectDecision(action);
+    if (!decisionId) return false;
+    this.bind(decisionId, action, result);
+    return true;
+  }
   assertAction(id: string, action: string) {
     const d = this.decisions.get(id);
     if (!d || d.action !== action || d.resultId || d.executing)

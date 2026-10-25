@@ -5,10 +5,10 @@ The default MCP interface exposes the original REA tools directly, plus the addi
 1. Identify the user's selected target and authorized interaction scope.
 2. Call `rea_discover` with relevant words and `detail:"names"`; request `detail:"schema"` for exact selected names. Do not guess upstream arguments.
 3. Optionally call `rl_suggest` with the current context and available names. Example context: `{"domain":"analysis","target":"native","stage":"inventory"}`. A goal can be `{"pointer":"/format","operator":"equals","expected":"pe"}` for a selected Windows executable; the predicate is evaluated against normalized Evidence when available.
-4. Call `rea_run` with the exact `name`, tool `input`, and optional `decision_id`. Default `detail:"summary"` returns a retained `result_id`. Error results remain errors.
+4. Call the recommended original REA tool directly with its original arguments. When exactly one pending RL decision matches that tool, the server retains its result for feedback while returning the original REA response unchanged. If multiple recommendations for the same tool are pending, use `rea_run` with the exact `name`, tool `input`, and chosen `decision_id` to bind unambiguously. Default `detail:"summary"` returns a retained `result_id`. Error results remain errors.
 5. Call `rea_result` with `result_id` and a JSON Pointer into the original parsed result. Follow `next_offset` until complete when necessary. A missing pointer is distinct from JSON null.
 6. If text cannot answer a visual question, call `rea_visual` with a retained result or absolute PNG path and a reason: `layout_geometry`, `diagram_structure`, `text_insufficient`, or `visual_verification`. Optional crop is `{x,y,width,height}` in original pixels. Default maximum dimension is 1280. Supported format is PNG, at most 16 million source pixels and 32 MiB encoded input.
-7. Call `rl_feedback` with the decision, next context and `done`. Tool failure incurs a penalty. Human ratings are optional. A predicate that passes says only that its chosen condition passed.
+7. Call `rl_feedback` with the decision, next context and `done`. Direct calls only bind when one matching recommendation is unambiguous. Tool failure incurs a penalty. Human ratings are optional. A predicate that passes says only that its chosen condition passed.
 8. Export selected `result_ids` to a new absolute `output_dir` using `okf_export`. Add `include_policy:true` only when policy persistence is wanted.
 
 ## Reconstruct a web interface

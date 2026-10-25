@@ -8,7 +8,7 @@ import { ReaUpstream, reaScript } from "./upstream.js";
 import { generateFrontend, writeFrontend } from "./frontend.js";
 import { nativeReadiness } from "./readiness.js";
 
-const HELP = `REA RL MCP 0.2.0
+const HELP = `REA RL MCP 0.2.1
 
 rea-rl mcp [--compact] [--rea-script ABSOLUTE_SCRIPT] [--cache-mb 64] [--policy POLICY_JSON]
 rea-rl official [original REA arguments...]
@@ -47,7 +47,7 @@ async function main() {
     return;
   }
   if (command === "--version") {
-    console.log("0.2.0");
+    console.log("0.2.1");
     return;
   }
   if (command === "official") {

@@ -8,6 +8,8 @@ The default stdio catalog contains 215 tools: all 207 official tool definitions 
 
 The Ghidra native check opens and analyzes through direct original tools, retrieves procedures through `rea_run`, then closes directly. It passed with 228 procedures, nonempty C-like pseudocode and assembly, demonstrating shared target state across both interfaces. This does not imply every original tool/provider was executed. IDA, Hopper and Kuna retain upstream platform and setup requirements.
 
+Version 0.2.1 also verifies RL feedback after a direct original tool call. With a single matching pending recommendation, the original result is retained and linked without changing the direct response. When two matching recommendations are pending, auto-linking is disabled; callers can explicitly bind the intended decision through `rea_run`.
+
 The earlier validation below records the initial product and provider checks.
 
 - Product TypeScript check and bundle: passed.

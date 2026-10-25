@@ -83,6 +83,29 @@ test("Q-learning binds actual actions, credits a fixed predicate once and keeps 
     /already executed/,
   );
 });
+test("one direct-call decision can be linked for feedback without changing the tool call", () => {
+  const store = new ResultStore(),
+    policy = new LearningPolicy((id) => store.get(id));
+  assert.equal(policy.pendingDirectDecision("inspect"), undefined);
+  const first = policy.suggest(context, ["inspect"], undefined);
+  assert.equal(policy.pendingDirectDecision("inspect"), first.decision_id);
+  const second = policy.suggest(context, ["inspect"], undefined);
+  assert.equal(policy.pendingDirectDecision("inspect"), undefined);
+  const completed = store.add("inspect", {
+    content: [],
+    structuredContent: { observed: true },
+  });
+  policy.bind(first.decision_id, "inspect", completed);
+  const direct = store.add("inspect", {
+    content: [],
+    structuredContent: { observed: true },
+  });
+  assert.equal(policy.bindDirect("inspect", direct), true);
+  assert.equal(
+    policy.feedback(second.decision_id, context, true, undefined).goal_passed,
+    false,
+  );
+});
 test("failed tools cannot earn a goal reward", () => {
   const store = new ResultStore(),
     policy = new LearningPolicy((id) => store.get(id));
