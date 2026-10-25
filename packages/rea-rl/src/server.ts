@@ -5,6 +5,7 @@ import { z } from "zod";
 import { ResultStore, pointer, summarize, textResult } from "./results.js";
 import { LearningPolicy, contextSchema, goalSchema } from "./policy.js";
 import { ReaUpstream, type ReaConnection } from "./upstream.js";
+import { PRODUCT_VERSION } from "./version.js";
 import { cropSchema, pngFrom, visualResult } from "./visual.js";
 import { exportOkf } from "./okf.js";
 import {
@@ -48,7 +49,7 @@ export function createProduct(
   budgetBytes = 64 * 1024 * 1024,
 ) {
   const server = new McpServer(
-    { name: "rea-rl-mcp", version: "0.2.1" },
+    { name: "rea-rl-mcp", version: PRODUCT_VERSION },
     { instructions: INSTRUCTIONS },
   );
   const store = new ResultStore(budgetBytes),

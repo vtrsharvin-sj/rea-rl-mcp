@@ -3,6 +3,7 @@ import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import type { CallToolResult } from "@modelcontextprotocol/server";
+import { PRODUCT_VERSION } from "./version.js";
 
 export interface ToolInfo {
   name: string;
@@ -39,7 +40,7 @@ export class ReaUpstream implements ReaConnection {
     return this.pending;
   }
   private async open() {
-    const client = new Client({ name: "rea-rl-mcp", version: "0.2.1" });
+    const client = new Client({ name: "rea-rl-mcp", version: PRODUCT_VERSION });
     const env = Object.fromEntries(
       Object.entries(process.env).filter(
         (entry): entry is [string, string] => entry[1] !== undefined,

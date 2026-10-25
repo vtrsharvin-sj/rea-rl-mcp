@@ -2,11 +2,12 @@ import { Client } from "@modelcontextprotocol/client";
 import { InMemoryTransport, Server } from "@modelcontextprotocol/server";
 import { createProduct } from "./server.js";
 import { ReaUpstream } from "./upstream.js";
+import { PRODUCT_VERSION } from "./version.js";
 
 /** Both interfaces share one official REA process and its target/session state. */
 export async function createFullProduct(upstream: ReaUpstream, budget: number) {
   const product = createProduct(upstream, budget);
-  const addon = new Client({ name: "rea-rl-addons", version: "0.2.1" });
+  const addon = new Client({ name: "rea-rl-addons", version: PRODUCT_VERSION });
   const [clientTransport, serverTransport] =
     InMemoryTransport.createLinkedPair();
   try {
@@ -27,7 +28,7 @@ export async function createFullProduct(upstream: ReaUpstream, budget: number) {
         throw new Error(`REA tool collision: ${tool.name}`);
     }
     const server = new Server(
-      { name: "rea-rl-mcp", version: "0.2.1" },
+      { name: "rea-rl-mcp", version: PRODUCT_VERSION },
       {
         capabilities: {
           ...official.getServerCapabilities(),

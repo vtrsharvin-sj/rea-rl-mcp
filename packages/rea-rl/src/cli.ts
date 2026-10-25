@@ -7,8 +7,9 @@ import { spawn } from "node:child_process";
 import { ReaUpstream, reaScript } from "./upstream.js";
 import { generateFrontend, writeFrontend } from "./frontend.js";
 import { nativeReadiness } from "./readiness.js";
+import { PRODUCT_VERSION } from "./version.js";
 
-const HELP = `REA RL MCP 0.2.1
+const HELP = `REA RL MCP ${PRODUCT_VERSION}
 
 rea-rl mcp [--compact] [--rea-script ABSOLUTE_SCRIPT] [--cache-mb 64] [--policy POLICY_JSON]
 rea-rl official [original REA arguments...]
@@ -47,7 +48,7 @@ async function main() {
     return;
   }
   if (command === "--version") {
-    console.log("0.2.1");
+    console.log(PRODUCT_VERSION);
     return;
   }
   if (command === "official") {
